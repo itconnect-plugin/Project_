@@ -116,9 +116,10 @@ function drawBoard() {
 
 // 다음 피스 표시
 function drawNextPiece() {
-    const nextPieceCanvas = document.getElementById('next-piece');
+    const nextPieceCanvas = document.getElementById('next-piece-canvas');
+    const container = document.getElementById('next-piece');
+    
     if (!nextPieceCanvas) {
-        const container = document.getElementById('next-piece');
         const canvas = document.createElement('canvas');
         canvas.width = 100;
         canvas.height = 100;
@@ -197,13 +198,15 @@ function drawMatrix(matrix, offset) {
 
 // 충돌 확인
 function collide(board, player) {
-    const [m, o] = [player.matrix, player.pos];
+    const m = player.matrix;
+    const o = player.pos;
     
     for (let y = 0; y < m.length; ++y) {
         for (let x = 0; x < m[y].length; ++x) {
-            if (m[y][x] !== 0 &&
-                (board[y + o.y] && 
-                board[y + o.y][x + o.x]) !== 0) {
+            if (m[y][x] !== 0 && 
+                (board[y + o.y] === undefined || 
+                 board[y + o.y][x + o.x] === undefined ||
+                 board[y + o.y][x + o.x] !== 0)) {
                 return true;
             }
         }
@@ -386,23 +389,24 @@ document.addEventListener('keydown', event => {
         return;
     }
     
-    switch (event.keyCode) {
-        case 37: // 왼쪽 화살표
+    switch (event.key) {
+        case 'ArrowLeft': // 왼쪽 화살표
             playerMove(-1);
             break;
-        case 39: // 오른쪽 화살표
+        case 'ArrowRight': // 오른쪽 화살표
             playerMove(1);
             break;
-        case 40: // 아래쪽 화살표
+        case 'ArrowDown': // 아래쪽 화살표
             playerDrop();
             break;
-        case 38: // 위쪽 화살표
+        case 'ArrowUp': // 위쪽 화살표
             playerRotate(1);
             break;
-        case 32: // 스페이스바
+        case ' ': // 스페이스바
             playerHardDrop();
             break;
-        case 80: // P
+        case 'p': // P
+        case 'P':
             togglePause();
             break;
     }
@@ -427,6 +431,7 @@ function startGame() {
         level = 1;
         lines = 0;
         dropInterval = 1000;
+        dropCounter = 0;
         
         board = createBoard();
         player = createPlayer();
@@ -437,7 +442,7 @@ function startGame() {
         document.getElementById('lines').textContent = lines;
         
         lastTime = performance.now();
-        requestAnimationFrame(update);
+        update(lastTime);
     }
 }
 
@@ -445,6 +450,21 @@ function startGame() {
 function resetGame() {
     gameStarted = false;
     gameOver = false;
+    isPaused = false;
+    score = 0;
+    level = 1;
+    lines = 0;
+    dropInterval = 1000;
+    dropCounter = 0;
+    
+    board = createBoard();
+    player = createPlayer();
+    nextPiece = getRandomPiece();
+    
+    document.getElementById('score').textContent = score;
+    document.getElementById('level').textContent = level;
+    document.getElementById('lines').textContent = lines;
+    
     startGame();
 }
 
