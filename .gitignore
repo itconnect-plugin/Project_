@@ -1,0 +1,23 @@
+# 환경 변수 파일
+.env
+
+# 로그 파일
+*.log
+
+# 운영체제 파일
+.DS_Store
+Thumbs.db
+
+# 노드 모듈
+node_modules/
+npm-debug.log
+
+# 빌드 결과물
+/dist
+/build
+
+# IDE 설정
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace 
